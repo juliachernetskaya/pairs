@@ -124,14 +124,14 @@ let controller = {
     		(temporaryData.wrongAttempt - temporaryData.areaSize/2)) *
     		temporaryData.areaSize * 100/
     		(+t.h.innerHTML + +t.m.innerHTML * 60 + +t.s.innerHTML * 3600));
-
-		let storage = JSON.parse(localStorage.getItem(game.userName));????????????
-		console.log(storage);
-		let	newStorage = JSON.stringify(storage.push({date: new Date(), score: game.score}));
-		// let arr = [].push(newStorage)
-			
-			localStorage.setItem(game.userName, newStorage)
-			console.log(newStorage);
+		let	newStorage = ({date: new Date(), score: game.score});
+		let storage = JSON.parse(localStorage.getItem(game.userName));
+		storage !== null ? (storage[storage.length] = newStorage) : storage = [newStorage];
+		localStorage.setItem(game.userName, JSON.stringify(storage))
+		// let arr = storage.push(newStorage)
+			// console.log(arr)
+			// localStorage.setItem(game.userName, newStorage)
+			console.log(JSON.parse(localStorage.getItem(game.userName)));
 	    console.log(
 	    	`${game.userName}, you win, 
 	    	your time: ${game.time},
