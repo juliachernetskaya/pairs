@@ -5,6 +5,26 @@ let CardModel = function (data) {
 		this._img = data.img
 	}, 
 
+	Results = function (data) {
+		// this.tab = tab,
+		this.user = data.user,
+		this.score = data.score,
+		this.date = data.date
+
+		this.cell = function () {
+			return `
+			// <table>
+			// 	<tbody>
+					<tr>
+						<td>${this.user}</td>
+						<td>${this.score}</td>
+						<td>${this.date}</td>
+					</tr>
+			// 	</tbody>
+			// </table>`
+		}
+	},
+
 	temporaryData = {
 		resultsArray: [],
 		cards: [],
@@ -134,26 +154,21 @@ let controller = {
     		temporaryData.areaSize * 100/
     		(+t.h.innerHTML + +t.m.innerHTML * 60 + +t.s.innerHTML * 3600));
 
-		let	newStorage = ({[game.userName + '']: [{date: new Date(), score: game.score}]});
-		console.log(newStorage)
-		let storage = menu.getStorage();//{user: [{},{},{}], user2: [{},{},{}]}
-		console.log(storage)
+		let	newStorage = ({[temporaryData.areaSize + '']: [{
+				user: game.userName, 
+				date: new Date(), 
+				score: game.score}
+				]}
+			);
+		let storage = menu.getStorage();
 		if(storage === null) {
 			storage = newStorage;
 			
-		}else if(storage !== null && storage[game.userName + ''] === undefined){
-			console.log('1', storage, storage[game.userName + ''], game.userName)
-			storage[game.userName] = newStorage[game.userName + '']
-			// storage[game.userName] = newStorage
-			// console.log(storage.game.userName)
+		}else if(storage !== null && storage[temporaryData.areaSize] === undefined){
+			storage[temporaryData.areaSize] = newStorage[temporaryData.areaSize]
 		}else{
-			// for (key in storage) {
-			// 	// statement
-			// }
-			console.log('2', game.userName, storage[game.userName + ''].length, newStorage[game.userName + ''][0])
-			// storage !== null && storage[game.userName] !== undefined
-			storage[game.userName][storage[game.userName + ''].length] = newStorage[game.userName + ''][0]
-			console.log('3', storage)
+			storage[temporaryData.areaSize][storage[temporaryData.areaSize].length] 
+			= newStorage[temporaryData.areaSize][0]
 		}
 		menu.setStorage(storage); 
 
@@ -179,7 +194,22 @@ let controller = {
 
 	userScores: function () {
 		let storage = menu.getStorage();
-		console.log(storage)
+
+		for (key in storage) {
+			let tab = `${Math.sqrt(+key)}x${Math.sqrt(+key)}`;
+			// console.log(storage[key])	
+			let arr = storage[key].sort((a, b) => b.score - a.score)
+			let row;
+			// console.log(arr)	
+			for (let i = 0; i < arr.length; i++) {
+				// data = storage[key][i];
+				row = new Results(arr[i]);
+				console.log(row.cell())	
+			}
+			// let row = new Results(storage[key][i]);
+			
+			
+		}
 	}
 }
 
