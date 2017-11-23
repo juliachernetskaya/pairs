@@ -1,10 +1,16 @@
 //Model
-let temporaryData = {
-	resultsArray: [],
-	cards: [],
-	areaSize: 0,
-	wrongAttempt: 0,
-	rightAttempt: 0,
+let CardModel = function (data) {
+		this._value = data.value,
+		this._view = "card",
+		this._img = data.img
+	}, 
+
+	temporaryData = {
+		resultsArray: [],
+		cards: [],
+		areaSize: 0,
+		wrongAttempt: 0,
+		rightAttempt: 0,
 	},
 
 	game = {
@@ -12,24 +18,33 @@ let temporaryData = {
 		time: 0,
 		score: 100000,
 		getUsername: function () {
-	    	this.userName = document.getElementById("user").value;	
+	    	this.userName = document.getElementById("user").value + '';	
+		}
+	},
+
+	menu = {
+		container: document.getElementById('container'),
+		pauseBtn: document.getElementById('pause'),
+		continueBtn: document.getElementById('continue'),
+		chooseUser: document.getElementById('submit'),
+		area: document.getElementById('selectAreaSize'),
+		showScore: document.getElementById('scores'),
+		getStorage: function () {
+			return JSON.parse(localStorage.getItem('pair'))
+		},
+		setStorage: function (obj) {
+			localStorage.setItem('pair', JSON.stringify(obj))
 		}
 	},
 
 	timer = {
-		// seconds: 0,
-		// minutes: 0,
-		// hours: 0,
 		start: function () {
-			// this.getTime();
 			let time = this.getTime();
+			menu.container.style.display = '';
+			menu.pauseBtn.style.display = '';
+			menu.continueBtn.style.display = 'none';
+			
 			this.interval = setInterval(function () {
-				// this.getTime();
-				// console.log(timer)
-				
-				// let s = document.getElementById("seconds"),
-				// 	m = document.getElementById("minutes"),
-				// 	h = document.getElementById("hours");
 			  	if(+time.s.innerHTML < 59 && +time.m.innerHTML !== 59) {
 			  		time.s.innerHTML = time.s.innerHTML++ < 9 
 			  			? ('0' + time.s.innerHTML++) : time.s.innerHTML++;
@@ -44,25 +59,21 @@ let temporaryData = {
 			  		time.s.innerHTML = '00';
 			  	}
 			}, 1000)
-
-
 		},
+
 		pause: function function_name() {
-			// this.seconds = +document.getElementById("seconds").innerHTML; 
-			// this.minutes = +document.getElementById("minutes").innerHTML;
-			// this.hours = +document.getElementById("hours").innerHTML;
-			
-			console.log(timer)
 			clearInterval(this.interval);
-		}, 
+			menu.pauseBtn.style.display = 'none';
+			menu.continueBtn.style.display = '';
+			menu.container.style.display = 'none';
+		},
+
 		stop: function () {
-			// console.log(timer)
-			// this.seconds = this.minutes = this.hours = 0; 
-			// console.log(timer)
 			this.setTime(0, 0, 0);
 			clearInterval(this.interval);
 			temporaryData.wrongAttempt = 0;
 		},
+
 		getTime: function () {
 			let time = {
 				s: document.getElementById("seconds"), 
@@ -71,6 +82,7 @@ let temporaryData = {
 			}
 			return time;	
 		},
+
 		setTime: function (s, m, h) {
 			document.getElementById("seconds").innerHTML = 
 				s < 9 ? ('0' + s) : s;
@@ -79,42 +91,39 @@ let temporaryData = {
 			document.getElementById("hours").innerHTML = 
 				h < 9 ? ('0' + h) : h;	
 		}
-		// getTime: function () {
-		// 	this.seconds = +document.getElementById("seconds").innerHTML,
-		// 	this.minutes = +document.getElementById("minutes").innerHTML,
-		// 	this.hours = +document.getElementById("hours").innerHTML;
-		// 	// return;
-		// }
-	}
-
-
-let CardModel = function (data) {
-	this._value = data.value,
-	this._view = "card",
-	this._img = data.img
-};
-
-
-
+	};
 
 //Controller
-
 let controller = {
-	changeArea: function () {
-		document.getElementById('selectAreaSize')
-			.onchange=function (event) {
-	    		cardView.init();	
-		};
-	},
-
 	init: function() {
-		document.getElementById('submit')
-		.onclick=function (event) {
+		menu.chooseUser.onclick=function () {
 			game.getUsername();
+			timer.stop();
+	    	timer.start();
 		}
+		menu.continueBtn.onclick = this.continueGame;
+		menu.pauseBtn.onclick = this.pauseGame;
+		menu.showScore.onclick = this.userScores;
 		
         cardView.init();
     },
+
+    changeArea: function () {
+		menu.area.onchange=function () {
+	    		cardView.init();
+	    		timer.stop();
+	    		timer.start();	
+		};
+	},
+
+	pauseGame: function () {
+		timer.pause();
+	},
+
+	continueGame: function () {
+		timer.start();
+	},
+
     finishGame: function () {
     	let t = timer.getTime();
     	game.time = `${t.h.innerHTML}:${t.m.innerHTML}:${t.s.innerHTML}`;
@@ -124,14 +133,30 @@ let controller = {
     		(temporaryData.wrongAttempt - temporaryData.areaSize/2)) *
     		temporaryData.areaSize * 100/
     		(+t.h.innerHTML + +t.m.innerHTML * 60 + +t.s.innerHTML * 3600));
-		let	newStorage = ({date: new Date(), score: game.score});
-		let storage = JSON.parse(localStorage.getItem(game.userName));
-		storage !== null ? (storage[storage.length] = newStorage) : storage = [newStorage];
-		localStorage.setItem(game.userName, JSON.stringify(storage))
-		// let arr = storage.push(newStorage)
-			// console.log(arr)
-			// localStorage.setItem(game.userName, newStorage)
-			console.log(JSON.parse(localStorage.getItem(game.userName)));
+
+		let	newStorage = ({[game.userName + '']: [{date: new Date(), score: game.score}]});
+		console.log(newStorage)
+		let storage = menu.getStorage();//{user: [{},{},{}], user2: [{},{},{}]}
+		console.log(storage)
+		if(storage === null) {
+			storage = newStorage;
+			
+		}else if(storage !== null && storage[game.userName + ''] === undefined){
+			console.log('1', storage, storage[game.userName + ''], game.userName)
+			storage[game.userName] = newStorage[game.userName + '']
+			// storage[game.userName] = newStorage
+			// console.log(storage.game.userName)
+		}else{
+			// for (key in storage) {
+			// 	// statement
+			// }
+			console.log('2', game.userName, storage[game.userName + ''].length, newStorage[game.userName + ''][0])
+			// storage !== null && storage[game.userName] !== undefined
+			storage[game.userName][storage[game.userName + ''].length] = newStorage[game.userName + ''][0]
+			console.log('3', storage)
+		}
+		menu.setStorage(storage); 
+
 	    console.log(
 	    	`${game.userName}, you win, 
 	    	your time: ${game.time},
@@ -150,17 +175,20 @@ let controller = {
 			  	x[0].className = className;
 			}
 		},600);
-	}
-	
-}
-//View
+	},
 
+	userScores: function () {
+		let storage = menu.getStorage();
+		console.log(storage)
+	}
+}
+
+//View
 let cardView = {
 	init: function() {
 		let cardsInstances = [];
-
-		temporaryData.areaSize = document.getElementById('selectAreaSize')
-			.options[document.getElementById('selectAreaSize')
+		temporaryData.areaSize = menu.area
+			.options[menu.area
 			.options.selectedIndex].value;
 		controller.changeArea();
 		
@@ -180,15 +208,16 @@ let cardView = {
 	},
 
 	render: function () {
-		let cardsArea = document.getElementById('container');
+		menu.continueBtn.style.display = 'none';
+		let cardsArea = menu.container;
 
 		while (container.firstChild) {
     		cardsArea.removeChild(container.firstChild);
 		}
 
 		temporaryData.cards.sort(this.shuffle);
-		timer.stop();
-		timer.start();
+		// timer.stop();
+		
 		for (let i = 0; i < temporaryData.cards.length; i++) {
 			let card = document.createElement('div');
 			card.dataset.value = temporaryData.cards[i]._value;
@@ -198,11 +227,14 @@ let cardView = {
 			cardsArea.appendChild(card);
 
 			card.onclick = this.flip;
-			
 		}
+
+		
+			
 	},
 
 	flip: function (e) {
+
 		let x = document.getElementsByClassName("flipped");	
 			if (x.length < 2 && e.target.className != 'flipped' 
 				&& e.target.className != 'correct'){
@@ -263,7 +295,7 @@ let cardView = {
 // cardView()
 
 		
-		
+	
 
 
 controller.init();
