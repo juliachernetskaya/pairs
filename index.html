@@ -2,30 +2,46 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="./style.css">
-
-	<title>Pairs</title>
+	<title>Marvel-pairs</title>
 </head>
 <body>
-	<div class="wrapper">
-		<h1>Pairs</h1>
-		<form>
-			<input id="user" type="text" placeholder="Please, enter your name">
-			<div id="submit">Ok</div>
-		</form>
-		<h3>Click any card to begin</h3>
-		<select name="select" id="selectAreaSize">
-			<option value="4" selected>2x2</option>
-			<option value="36">6x6</option>  
-			<option value="64">8x8</option>
-			<option value="100">10x10</option>
-			<option value="144">12x12</option>
-		</select>
-		<p class="timer"><span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span></p>
-		<div id="pause">Pause</div>
-		<div id="continue">Continue</div>
-		<div id="scores">Show scores</div>
-		<div id="container"></div>
+	
+	<div class="wrapper wrapper--theme-marvel">
+		<div class="header">
+			<div class="logo"><h1>Marvel-pairs</h1></div>
+			<div class="nav">	
+				<form class="select-form">
+					<select class="input select-form__input" name="select" id="selectTheme">
+						<option value="marvel" selected>marvel</option>
+						<option value="thor">thor</option>  
+					</select>
+					<label class="text select-form__text" for="selectTheme">Choose theme</label>
+
+					<select class="input select-form__input" name="select" id="selectAreaSize">
+						<option value="36" selected>6x6</option>  
+						<option value="64">8x8</option>
+						<option value="100">10x10</option>
+						<option value="144">12x12</option>
+					</select>
+					<label class="text select-form__text" for="selectAreaSize">Choose area</label>
+				</form>
+
+				<form class="login-form">
+					<input class="input login-form__input" id="user" type="text" placeholder="Please, enter your name">
+					<div class="button login-form__button login-form__button--theme-marvel" id="submit">Ok</div>
+				</form>
+
+				<div class="menu">
+					<div class="button menu__button menu__button--theme-marvel" id="scores">Scores</div>
+					<div class="button menu__button menu__button--theme-marvel" id="continue">Continue</div>
+					<div class="button menu__button menu__button--theme-marvel" id="pause">Pause</div>
+					<p class="text menu__text menu__text--timer" id="timer"><span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span></p>
+				</div>
+			</div>
+		</div>
+		<div class="container container--theme-marvel" id="container"></div>
 	</div>
 
 	<script src="./main.js"></script>
